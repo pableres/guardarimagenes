@@ -1,0 +1,72 @@
+library(ggplot2)
+library(rvg)
+library(officer)
+library(magrittr)
+
+set.seed(1234)
+df <- data.frame(
+  sex=factor(rep(c("M", "H"), each=200)),
+  weight=round(c(rnorm(200, mean=55, sd=5), rnorm(200, mean=65, sd=5)))
+)
+head(df)
+
+#histograma normal
+p<-ggplot(df, aes(x=weight)) + 
+  geom_histogram(aes(y=..density..), colour="black", fill="white")+
+  geom_density(alpha=.2, fill="#FF6666") 
+p
+  
+file.choose()
+setwd('C:/Users/pable/Desktop/You Tube/Guardarimag')
+
+
+png(file="fig1.png")
+p
+dev.off()
+
+bmp()
+jpeg()
+tiff()
+pdf()
+ps()
+svg()
+
+
+png(file="fig1.png",height=600,width=600)
+p
+dev.off()
+
+pdf(file="fig1.pdf")
+p
+dev.off()
+
+ggsave("figura2.pdf")
+
+
+ggsave(
+  "figura2.pdf",
+  plot = last_plot(),
+  device = NULL, #"eps", "ps", "tex" (pictex), "pdf", "jpeg", "tiff", "png", "bmp", "svg" or "wmf" (windows only).
+  path = NULL,
+  scale = 1,
+  width = NA,
+  height = NA,
+  units = c("in", "cm", "mm"),
+  dpi = 300,
+  limitsize = TRUE,
+)
+
+
+
+#crear figura en power point  modificable
+#primero pasamos nuestro objeto p a formato dml
+#esto dentro del paquete rvg
+p_dml <- rvg::dml(ggobj = p)
+
+officer::read_pptx() %>%
+  # añadir diapositiva ----
+officer::add_slide() %>%
+  # especificar objeto y lugar ----
+officer::ph_with(p_dml, ph_location()) %>%
+  # exportar diapositiva -----
+base::print("demostracion.pptx")
